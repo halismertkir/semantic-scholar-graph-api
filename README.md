@@ -1,0 +1,245 @@
+# 📚 Semantic Scholar MCP Server
+
+> **A comprehensive Model Context Protocol (MCP) server for seamless integration with Semantic Scholar's academic database**
+
+[![smithery badge](https://smithery.ai/badge/@alperenkocyigit/semantic-scholar-graph-api)](https://smithery.ai/server/@alperenkocyigit/semantic-scholar-graph-api)
+![Python](https://img.shields.io/badge/python-3.10+-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+
+**Maintainer:** [@alperenkocyigit](https://github.com/alperenkocyigit)
+
+This powerful MCP server bridges the gap between AI assistants and academic research by providing direct access to Semantic Scholar's comprehensive database. Whether you're conducting literature reviews, exploring citation networks, or seeking academic insights, this server offers a streamlined interface to millions of research papers.
+
+## 🌟 What Can You Do?
+
+### 🔍 **Advanced Paper Discovery**
+- **Smart Search**: Find papers using natural language queries
+- **Bulk Operations**: Process multiple papers simultaneously
+- **Autocomplete**: Get intelligent title suggestions as you type
+- **Precise Matching**: Find exact papers using title-based search
+
+### 👥 **Author Research**
+- **Author Profiles**: Comprehensive author information and metrics
+- **Bulk Author Data**: Fetch multiple author profiles at once
+- **Author Search**: Discover researchers by name or affiliation
+
+### 📊 **Citation Analysis**
+- **Citation Networks**: Explore forward and backward citations
+- **Reference Mapping**: Understand paper relationships
+- **Impact Metrics**: Access citation counts and paper influence
+
+### 💡 **Content Discovery**
+- **Text Snippets**: Search within paper content
+- **Contextual Results**: Find relevant passages and quotes
+- **Full-Text Access**: When available through Semantic Scholar
+
+---
+
+## 🛠️ Quick Setup
+
+### System Requirements
+- **Python**: 3.10 or higher
+- **Dependencies**: `requests`, `mcp`, `bs4`
+- **Network**: Stable internet connection for API access
+
+## 🚀 Installation Options
+
+### ⚡ One-Click Install with Smithery
+
+**For Claude Desktop:**
+```bash
+npx -y @smithery/cli@latest install @alperenkocyigit/semantic-scholar-graph-api --client claude --config "{}"
+```
+
+**For Cursor IDE:**
+Navigate to `Settings → Cursor Settings → MCP → Add new server` and paste:
+```bash
+npx -y @smithery/cli@latest run @alperenkocyigit/semantic-scholar-graph-api --client cursor --config "{}"
+```
+
+**For Windsurf:**
+```bash
+npx -y @smithery/cli@latest install @alperenkocyigit/semantic-scholar-graph-api --client windsurf --config "{}"
+```
+
+**For Cline:**
+```bash
+npx -y @smithery/cli@latest install @alperenkocyigit/semantic-scholar-graph-api --client cline --config "{}"
+```
+
+### 🔧 Manual Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/alperenkocyigit/semantic-scholar-graph-api.git
+   cd semantic-scholar-graph-api
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Run the server:**
+   ```bash
+   python semantic_scholar_server.py
+   ```
+
+---
+
+## 🔧 Configuration Guide
+
+### Claude Desktop Setup
+
+**macOS/Linux Configuration:**
+Add to your `claude_desktop_config.json`:
+```json
+{
+  "mcpServers": {
+    "semanticscholar": {
+      "command": "python",
+      "args": ["/path/to/your/semantic_scholar_server.py"]
+    }
+  }
+}
+```
+
+**Windows Configuration:**
+```json
+{
+  "mcpServers": {
+    "semanticscholar": {
+      "command": "C:\\Users\\YOUR_USERNAME\\miniconda3\\envs\\mcp_server\\python.exe",
+      "args": ["D:\\path\\to\\your\\semantic_scholar_server.py"],
+      "env": {},
+      "disabled": false,
+      "autoApprove": []
+    }
+  }
+}
+```
+
+### Cline Integration
+```json
+{
+  "mcpServers": {
+    "semanticscholar": {
+      "command": "bash",
+      "args": [
+        "-c",
+        "source /path/to/your/.venv/bin/activate && python /path/to/your/semantic_scholar_server.py"
+      ],
+      "env": {},
+      "disabled": false,
+      "autoApprove": []
+    }
+  }
+}
+```
+
+---
+
+## 🎯 Available Tools
+
+| Tool | Description | Use Case |
+|------|-------------|----------|
+| `search_semantic_scholar` | Search papers by query | Literature discovery |
+| `search_semantic_scholar_authors` | Find authors by name | Researcher identification |
+| `get_semantic_scholar_paper_details` | Get comprehensive paper info | Detailed analysis |
+| `get_semantic_scholar_author_details` | Get author profiles | Author research |
+| `get_semantic_scholar_citations_and_references` | Fetch citation network | Impact analysis |
+| `get_semantic_scholar_paper_match` | Find exact paper matches | Precise searching |
+| `get_semantic_scholar_paper_autocomplete` | Get title suggestions | Smart completion |
+| `get_semantic_scholar_papers_batch` | Bulk paper retrieval | Batch processing |
+| `get_semantic_scholar_authors_batch` | Bulk author data | Mass analysis |
+| `search_semantic_scholar_snippets` | Search text content | Content discovery |
+
+---
+
+## 💡 Usage Examples
+
+### Basic Paper Search
+```python
+# Search for papers on machine learning
+results = await search_semantic_scholar("machine learning", num_results=5)
+```
+
+### Author Research
+```python
+# Find authors working on natural language processing
+authors = await search_semantic_scholar_authors("natural language processing")
+```
+
+### Citation Analysis
+```python
+# Get citation network for a specific paper
+citations = await get_semantic_scholar_citations_and_references("paper_id_here")
+```
+
+---
+
+## 📂 Project Architecture
+
+```
+semantic-scholar-graph-api/
+├── 📄 README.md                    # Project documentation
+├── 📋 requirements.txt             # Python dependencies
+├── 🔍 semantic_scholar_search.py   # Core API interaction module
+├── 🖥️ semantic_scholar_server.py   # MCP server implementation
+└── 🗂️ __pycache__/                # Compiled Python files
+```
+
+### Core Components
+
+- **`semantic_scholar_search.py`**: Handles all interactions with the Semantic Scholar API, including rate limiting, error handling, and data processing
+- **`semantic_scholar_server.py`**: Implements the MCP server protocol and exposes tools for AI assistant integration
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions from the community! Here's how you can help:
+
+### Ways to Contribute
+- 🐛 **Bug Reports**: Found an issue? Let us know!
+- 💡 **Feature Requests**: Have ideas for improvements?
+- 🔧 **Code Contributions**: Submit pull requests
+- 📖 **Documentation**: Help improve our docs
+
+### Development Setup
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Make your changes and test thoroughly
+4. Commit your changes: `git commit -m 'Add amazing feature'`
+5. Push to the branch: `git push origin feature/amazing-feature`
+6. Open a Pull Request
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🙏 Acknowledgments
+
+- **Semantic Scholar Team** for providing the excellent API
+- **Model Context Protocol** community for the framework
+- **Contributors** who help improve this project
+
+---
+
+## 📞 Support
+
+- **Issues**: [GitHub Issues](https://github.com/alperenkocyigit/semantic-scholar-graph-api/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/alperenkocyigit/semantic-scholar-graph-api/discussions)
+- **Maintainer**: [@alperenkocyigit](https://github.com/alperenkocyigit)
+
+---
+
+<div align="center">
+  <strong>Made with ❤️ for the research community</strong>
+  <br>
+  <sub>Empowering AI assistants with academic knowledge</sub>
+</div>
