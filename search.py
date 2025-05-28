@@ -84,7 +84,7 @@ def search_papers(query: str, limit: int = 10) -> List[Dict[str, Any]]:
     params = {
         "query": query,
         "limit": min(limit, 100),  # API limit is 100
-        "fields": "paperId,title,abstract,year,authors,url,venue,publicationTypes,citationCount"
+        "fields": "paperId,title,abstract,year,authors,url,venue,publicationTypes,citationCount,tldr"
     }
     
     try:
@@ -103,7 +103,10 @@ def search_papers(query: str, limit: int = 10) -> List[Dict[str, Any]]:
                 "venue": paper.get("venue"),
                 "publicationTypes": paper.get("publicationTypes"),
                 "citationCount": paper.get("citationCount"),
-                "tldr": paper.get("tldr", "")
+                "tldr": {
+                    "model": paper.get("tldr", {}).get("model", ""),
+                    "text": paper.get("tldr", {}).get("text", "")
+                } if paper.get("tldr") else None
             } for paper in papers
         ]
     except Exception as e:
@@ -114,7 +117,7 @@ def get_paper_details(paper_id: str) -> Dict[str, Any]:
     """Get details of a specific paper."""
     url = f"{BASE_URL}/paper/{paper_id}"
     params = {
-        "fields": "paperId,title,abstract,year,authors,url,venue,publicationTypes,citationCount,referenceCount,influentialCitationCount,fieldsOfStudy,publicationDate"
+        "fields": "paperId,title,abstract,year,authors,url,venue,publicationTypes,citationCount,referenceCount,influentialCitationCount,fieldsOfStudy,publicationDate,tldr"
     }
     
     try:
@@ -134,7 +137,10 @@ def get_paper_details(paper_id: str) -> Dict[str, Any]:
             "influentialCitationCount": response_data.get("influentialCitationCount"),
             "fieldsOfStudy": response_data.get("fieldsOfStudy"),
             "publicationDate": response_data.get("publicationDate"),
-            "tldr": response_data.get("tldr", "")
+            "tldr": {
+                    "model": response_data.get("tldr", {}).get("model", ""),
+                    "text": response_data.get("tldr", {}).get("text", "")
+                } if response_data.get("tldr") else None
         }
     except Exception as e:
         logger.error(f"Error getting paper details for {paper_id}: {e}")
@@ -265,7 +271,7 @@ def search_paper_match(query: str) -> Dict[str, Any]:
     url = f"{BASE_URL}/paper/search/match"
     params = {
         "query": query,
-        "fields": "paperId,title,abstract,year,authors,url,venue,publicationTypes,citationCount"
+        "fields": "paperId,title,abstract,year,authors,url,venue,publicationTypes,citationCount,tldr"
     }
     
     try:
@@ -284,7 +290,10 @@ def search_paper_match(query: str) -> Dict[str, Any]:
                 "venue": paper.get("venue"),
                 "publicationTypes": paper.get("publicationTypes"),
                 "citationCount": paper.get("citationCount"),
-                "tldr": paper.get("tldr", "")
+                "tldr": {
+                    "model": paper.get("tldr", {}).get("model", ""),
+                    "text": paper.get("tldr", {}).get("text", "")
+                } if paper.get("tldr") else None
             }
         else:
             return {"error": "No matching paper found"}
@@ -324,7 +333,7 @@ def get_papers_batch(paper_ids: List[str]) -> List[Dict[str, Any]]:
         logger.warning(f"Paper IDs list truncated to 500 items (API limit)")
     
     params = {
-        "fields": "paperId,title,abstract,year,authors,url,venue,publicationTypes,citationCount,referenceCount,influentialCitationCount,fieldsOfStudy,publicationDate"
+        "fields": "paperId,title,abstract,year,authors,url,venue,publicationTypes,citationCount,referenceCount,influentialCitationCount,fieldsOfStudy,publicationDate,tldr"
     }
     
     json_data = {"ids": paper_ids}
@@ -348,7 +357,10 @@ def get_papers_batch(paper_ids: List[str]) -> List[Dict[str, Any]]:
                     "influentialCitationCount": paper.get("influentialCitationCount"),
                     "fieldsOfStudy": paper.get("fieldsOfStudy"),
                     "publicationDate": paper.get("publicationDate"),
-                    "tldr": paper.get("tldr", "")
+                    "tldr": {
+                        "model": paper.get("tldr", {}).get("model", ""),
+                        "text": paper.get("tldr", {}).get("text", "")
+                    } if paper.get("tldr") else None
                 } for paper in response_data if paper  # Filter out None entries
             ]
         else:
