@@ -102,7 +102,8 @@ def search_papers(query: str, limit: int = 10) -> List[Dict[str, Any]]:
                 "url": paper.get("url"),
                 "venue": paper.get("venue"),
                 "publicationTypes": paper.get("publicationTypes"),
-                "citationCount": paper.get("citationCount")
+                "citationCount": paper.get("citationCount"),
+                "tldr": paper.get("tldr", "")
             } for paper in papers
         ]
     except Exception as e:
@@ -132,7 +133,8 @@ def get_paper_details(paper_id: str) -> Dict[str, Any]:
             "referenceCount": response_data.get("referenceCount"),
             "influentialCitationCount": response_data.get("influentialCitationCount"),
             "fieldsOfStudy": response_data.get("fieldsOfStudy"),
-            "publicationDate": response_data.get("publicationDate")
+            "publicationDate": response_data.get("publicationDate"),
+            "tldr": response_data.get("tldr", "")
         }
     except Exception as e:
         logger.error(f"Error getting paper details for {paper_id}: {e}")
@@ -281,7 +283,8 @@ def search_paper_match(query: str) -> Dict[str, Any]:
                 "url": paper.get("url"),
                 "venue": paper.get("venue"),
                 "publicationTypes": paper.get("publicationTypes"),
-                "citationCount": paper.get("citationCount")
+                "citationCount": paper.get("citationCount"),
+                "tldr": paper.get("tldr", "")
             }
         else:
             return {"error": "No matching paper found"}
@@ -344,7 +347,8 @@ def get_papers_batch(paper_ids: List[str]) -> List[Dict[str, Any]]:
                     "referenceCount": paper.get("referenceCount"),
                     "influentialCitationCount": paper.get("influentialCitationCount"),
                     "fieldsOfStudy": paper.get("fieldsOfStudy"),
-                    "publicationDate": paper.get("publicationDate")
+                    "publicationDate": paper.get("publicationDate"),
+                    "tldr": paper.get("tldr", "")
                 } for paper in response_data if paper  # Filter out None entries
             ]
         else:
