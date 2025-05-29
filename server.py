@@ -12,7 +12,6 @@ mcp = FastMCP("semanticscholar")
 
 @mcp.tool()
 async def search_semantic_scholar(query: str, num_results: int = 10) -> List[Dict[str, Any]]:
-    logging.info(f"Searching for papers with query: {query}, num_results: {num_results}")
     """
     Search for papers on Semantic Scholar using a query string.
 
@@ -23,6 +22,7 @@ async def search_semantic_scholar(query: str, num_results: int = 10) -> List[Dic
     Returns:
         List of dictionaries containing paper information
     """
+    logging.info(f"Searching for papers with query: {query}, num_results: {num_results}")
     try:
         results = await asyncio.to_thread(search_papers, query, num_results)
         return results
@@ -31,7 +31,6 @@ async def search_semantic_scholar(query: str, num_results: int = 10) -> List[Dic
 
 @mcp.tool()
 async def get_semantic_scholar_paper_details(paper_id: str) -> Dict[str, Any]:
-    logging.info(f"Fetching paper details for paper ID: {paper_id}")
     """
     Get details of a specific paper on Semantic Scholar.
 
@@ -41,6 +40,7 @@ async def get_semantic_scholar_paper_details(paper_id: str) -> Dict[str, Any]:
     Returns:
         Dictionary containing paper details
     """
+    logging.info(f"Fetching paper details for paper ID: {paper_id}")
     try:
         paper = await asyncio.to_thread(get_paper_details, paper_id)
         return paper
@@ -49,7 +49,6 @@ async def get_semantic_scholar_paper_details(paper_id: str) -> Dict[str, Any]:
 
 @mcp.tool()
 async def get_semantic_scholar_author_details(author_id: str) -> Dict[str, Any]:
-    logging.info(f"Fetching author details for author ID: {author_id}")
     """
     Get details of a specific author on Semantic Scholar.
 
@@ -59,6 +58,7 @@ async def get_semantic_scholar_author_details(author_id: str) -> Dict[str, Any]:
     Returns:
         Dictionary containing author details
     """
+    logging.info(f"Fetching author details for author ID: {author_id}")
     try:
         author = await asyncio.to_thread(get_author_details, author_id)
         return author
@@ -67,7 +67,6 @@ async def get_semantic_scholar_author_details(author_id: str) -> Dict[str, Any]:
 
 @mcp.tool()
 async def get_semantic_scholar_citations_and_references(paper_id: str) -> Dict[str, List[Dict[str, Any]]]:
-    logging.info(f"Fetching citations and references for paper ID: {paper_id}")
     """
     Get citations and references for a specific paper on Semantic Scholar.
 
@@ -77,6 +76,7 @@ async def get_semantic_scholar_citations_and_references(paper_id: str) -> Dict[s
     Returns:
         Dictionary containing lists of citations and references
     """
+    logging.info(f"Fetching citations and references for paper ID: {paper_id}")
     try:
         citations_refs = await asyncio.to_thread(get_citations_and_references, paper_id)
         return citations_refs
@@ -85,7 +85,6 @@ async def get_semantic_scholar_citations_and_references(paper_id: str) -> Dict[s
 
 @mcp.tool()
 async def search_semantic_scholar_authors(query: str, limit: int = 10) -> List[Dict[str, Any]]:
-    logging.info(f"Searching for authors with query: {query}, limit: {limit}")
     """
     Search for authors on Semantic Scholar using a query string.
 
@@ -96,6 +95,7 @@ async def search_semantic_scholar_authors(query: str, limit: int = 10) -> List[D
     Returns:
         List of dictionaries containing author information
     """
+    logging.info(f"Searching for authors with query: {query}, limit: {limit}")
     try:
         from search import search_authors
         results = await asyncio.to_thread(search_authors, query, limit)
@@ -105,7 +105,6 @@ async def search_semantic_scholar_authors(query: str, limit: int = 10) -> List[D
 
 @mcp.tool()
 async def get_semantic_scholar_paper_match(query: str) -> Dict[str, Any]:
-    logging.info(f"Finding paper match for query: {query}")
     """
     Find the best matching paper on Semantic Scholar using title-based search.
 
@@ -115,6 +114,7 @@ async def get_semantic_scholar_paper_match(query: str) -> Dict[str, Any]:
     Returns:
         Dictionary containing the best matching paper with match score
     """
+    logging.info(f"Finding paper match for query: {query}")
     try:
         from search import search_paper_match
         result = await asyncio.to_thread(search_paper_match, query)
@@ -124,7 +124,6 @@ async def get_semantic_scholar_paper_match(query: str) -> Dict[str, Any]:
 
 @mcp.tool()
 async def get_semantic_scholar_paper_autocomplete(query: str) -> List[Dict[str, Any]]:
-    logging.info(f"Getting paper autocomplete for query: {query}")
     """
     Get paper title autocompletion suggestions for a partial query.
 
@@ -134,6 +133,7 @@ async def get_semantic_scholar_paper_autocomplete(query: str) -> List[Dict[str, 
     Returns:
         List of dictionaries containing autocomplete suggestions
     """
+    logging.info(f"Getting paper autocomplete for query: {query}")
     try:
         from search import get_paper_autocomplete
         results = await asyncio.to_thread(get_paper_autocomplete, query)
@@ -143,7 +143,6 @@ async def get_semantic_scholar_paper_autocomplete(query: str) -> List[Dict[str, 
 
 @mcp.tool()
 async def get_semantic_scholar_papers_batch(paper_ids: List[str]) -> List[Dict[str, Any]]:
-    logging.info(f"Fetching batch paper details for {len(paper_ids)} papers")
     """
     Get details for multiple papers at once using batch API.
 
@@ -153,6 +152,7 @@ async def get_semantic_scholar_papers_batch(paper_ids: List[str]) -> List[Dict[s
     Returns:
         List of dictionaries containing paper details
     """
+    logging.info(f"Fetching batch paper details for {len(paper_ids)} papers")
     try:
         from search import get_papers_batch
         results = await asyncio.to_thread(get_papers_batch, paper_ids)
@@ -162,7 +162,6 @@ async def get_semantic_scholar_papers_batch(paper_ids: List[str]) -> List[Dict[s
 
 @mcp.tool()
 async def get_semantic_scholar_authors_batch(author_ids: List[str]) -> List[Dict[str, Any]]:
-    logging.info(f"Fetching batch author details for {len(author_ids)} authors")
     """
     Get details for multiple authors at once using batch API.
 
@@ -172,6 +171,7 @@ async def get_semantic_scholar_authors_batch(author_ids: List[str]) -> List[Dict
     Returns:
         List of dictionaries containing author details
     """
+    logging.info(f"Fetching batch author details for {len(author_ids)} authors")
     try:
         from search import get_authors_batch
         results = await asyncio.to_thread(get_authors_batch, author_ids)
@@ -181,7 +181,6 @@ async def get_semantic_scholar_authors_batch(author_ids: List[str]) -> List[Dict
 
 @mcp.tool()
 async def search_semantic_scholar_snippets(query: str, limit: int = 10) -> List[Dict[str, Any]]:
-    logging.info(f"Searching for text snippets with query: {query}, limit: {limit}")
     """
     Search for text snippets from papers that match the query.
 
@@ -192,6 +191,7 @@ async def search_semantic_scholar_snippets(query: str, limit: int = 10) -> List[
     Returns:
         List of dictionaries containing snippet matches with paper info
     """
+    logging.info(f"Searching for text snippets with query: {query}, limit: {limit}")
     try:
         from search import search_snippets
         results = await asyncio.to_thread(search_snippets, query, limit)
@@ -205,7 +205,6 @@ async def get_semantic_scholar_paper_recommendations_from_lists(
     negative_paper_ids: List[str] = None, 
     limit: int = 10
 ) -> List[Dict[str, Any]]:
-    logging.info(f"Getting paper recommendations from lists: {len(positive_paper_ids)} positive, {len(negative_paper_ids) if negative_paper_ids else 0} negative, limit: {limit}")
     """
     Get recommended papers based on lists of positive and negative example papers.
 
@@ -217,6 +216,7 @@ async def get_semantic_scholar_paper_recommendations_from_lists(
     Returns:
         List of dictionaries containing recommended papers with relevance scores
     """
+    logging.info(f"Getting paper recommendations from lists: {len(positive_paper_ids)} positive, {len(negative_paper_ids) if negative_paper_ids else 0} negative, limit: {limit}")
     try:
         from search import get_paper_recommendations_from_lists
         results = await asyncio.to_thread(get_paper_recommendations_from_lists, positive_paper_ids, negative_paper_ids, limit)
@@ -226,7 +226,6 @@ async def get_semantic_scholar_paper_recommendations_from_lists(
 
 @mcp.tool()
 async def get_semantic_scholar_paper_recommendations(paper_id: str, limit: int = 10) -> List[Dict[str, Any]]:
-    logging.info(f"Getting paper recommendations for single paper: {paper_id}, limit: {limit}")
     """
     Get recommended papers for a single positive example paper.
 
@@ -237,6 +236,7 @@ async def get_semantic_scholar_paper_recommendations(paper_id: str, limit: int =
     Returns:
         List of dictionaries containing recommended papers similar to the input paper
     """
+    logging.info(f"Getting paper recommendations for single paper: {paper_id}, limit: {limit}")
     try:
         from search import get_paper_recommendations
         results = await asyncio.to_thread(get_paper_recommendations, paper_id, limit)
@@ -245,6 +245,6 @@ async def get_semantic_scholar_paper_recommendations(paper_id: str, limit: int =
         return [{"error": f"An error occurred while getting paper recommendations for single paper: {str(e)}"}]
 
 if __name__ == "__main__":
-    logging.info("Starting Semantic Scholar MCP server")
     # Initialize and run the server
+    logging.info("Starting Semantic Scholar MCP server")
     mcp.run(transport='stdio')
