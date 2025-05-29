@@ -437,6 +437,90 @@ def search_snippets(query: str, limit: int = 10) -> List[Dict[str, Any]]:
         logger.error(f"Error searching snippets: {e}")
         return []
 
+def get_paper_recommendations_from_lists(positive_paper_ids: List[str], negative_paper_ids: List[str] = None, limit: int = 10) -> List[Dict[str, Any]]:
+    """Get recommended papers based on lists of positive and negative example papers."""
+    url = f"{BASE_URL}/recommendations/v1/papers/forpaper"
+    
+    # Prepare the request payload
+    payload = {
+        "positivePaperIds": positive_paper_ids,
+        "limit": min(limit, 500)  # API typical limit
+    }
+    
+    if negative_paper_ids:
+        payload["negativePaperIds"] = negative_paper_ids
+    
+    params = {
+        "fields": "paperId,title,abstract,year,authors,url,venue,publicationTypes,citationCount,tldr"
+    }
+    
+    try:
+        response_data = make_request_with_retry(url, params=params, json_data=payload, method="POST")
+        
+        # Handle both direct list response and data wrapper
+        papers = response_data if isinstance(response_data, list) else response_data.get("recommendedPapers", response_data.get("data", []))
+        
+        return [
+            {
+                "paperId": paper.get("paperId"),
+                "title": paper.get("title"),
+                "abstract": paper.get("abstract"),
+                "year": paper.get("year"),
+                "authors": [{"name": author.get("name"), "authorId": author.get("authorId")} 
+                           for author in paper.get("authors", [])],
+                "url": paper.get("url"),
+                "venue": paper.get("venue"),
+                "publicationTypes": paper.get("publicationTypes"),
+                "citationCount": paper.get("citationCount"),
+                "recommendationScore": paper.get("recommendationScore"),
+                "tldr": {
+                    "model": paper.get("tldr", {}).get("model", ""),
+                    "text": paper.get("tldr", {}).get("text", "")
+                } if paper.get("tldr") else None
+            } for paper in papers
+        ]
+    except Exception as e:
+        logger.error(f"Error getting paper recommendations from lists: {e}")
+        return []
+
+def get_paper_recommendations(paper_id: str, limit: int = 10) -> List[Dict[str, Any]]:
+    """Get recommended papers for a single positive example paper."""
+    url = f"{BASE_URL}/paper/{paper_id}/recommendations"
+    
+    params = {
+        "limit": min(limit, 500),  # API typical limit
+        "fields": "paperId,title,abstract,year,authors,url,venue,publicationTypes,citationCount,tldr"
+    }
+    
+    try:
+        response_data = make_request_with_retry(url, params=params)
+        
+        # Handle both direct list response and data wrapper
+        papers = response_data if isinstance(response_data, list) else response_data.get("recommendedPapers", response_data.get("data", []))
+        
+        return [
+            {
+                "paperId": paper.get("paperId"),
+                "title": paper.get("title"),
+                "abstract": paper.get("abstract"),
+                "year": paper.get("year"),
+                "authors": [{"name": author.get("name"), "authorId": author.get("authorId")} 
+                           for author in paper.get("authors", [])],
+                "url": paper.get("url"),
+                "venue": paper.get("venue"),
+                "publicationTypes": paper.get("publicationTypes"),
+                "citationCount": paper.get("citationCount"),
+                "recommendationScore": paper.get("recommendationScore"),
+                "tldr": {
+                    "model": paper.get("tldr", {}).get("model", ""),
+                    "text": paper.get("tldr", {}).get("text", "")
+                } if paper.get("tldr") else None
+            } for paper in papers
+        ]
+    except Exception as e:
+        logger.error(f"Error getting paper recommendations for {paper_id}: {e}")
+        return []
+
 def main():
     """Test function for the API client."""
     try:
@@ -494,6 +578,19 @@ def main():
             snippet_query = search_results[0]['title']
             snippets = search_snippets(snippet_query, limit=2)
             print(f"Snippets: {snippets}")
+
+        # Get paper recommendations from lists
+        if search_results:
+            positive_paper_ids = [search_results[0]['paperId']]
+            negative_paper_ids = [search_results[1]['paperId']]  # Just for testing, may not be relevant
+            recommendations = get_paper_recommendations_from_lists(positive_paper_ids, negative_paper_ids, limit=2)
+            print(f"Recommendations from lists: {recommendations}")
+
+        # Get paper recommendations single
+        if search_results:
+            paper_id = search_results[0]['paperId']
+            single_recommendations = get_paper_recommendations_single(paper_id, limit=2)
+            print(f"Single paper recommendations: {single_recommendations}")
 
     except Exception as e:
         print(f"An error occurred: {e}")
