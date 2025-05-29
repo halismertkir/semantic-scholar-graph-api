@@ -5,6 +5,7 @@ from typing import List, Dict, Any, Optional
 
 # Base URL for the Semantic Scholar API
 BASE_URL = "https://api.semanticscholar.org/graph/v1"
+BASE_RECOMMENDATION_URL = "https://api.semanticscholar.org/recommendations/v1"
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -439,82 +440,104 @@ def search_snippets(query: str, limit: int = 10) -> List[Dict[str, Any]]:
 
 def get_paper_recommendations_from_lists(positive_paper_ids: List[str], negative_paper_ids: List[str] = None, limit: int = 10) -> List[Dict[str, Any]]:
     """Get recommended papers based on lists of positive and negative example papers."""
-    url = f"{BASE_URL}/recommendations/v1/papers/forpaper"
+    url = f"{BASE_RECOMMENDATION_URL}/papers"
     
     # Prepare the request payload
     payload = {
-        "positivePaperIds": positive_paper_ids,
-        "limit": min(limit, 500)  # API typical limit
+        "positivePaperIds": positive_paper_ids
     }
     
     if negative_paper_ids:
         payload["negativePaperIds"] = negative_paper_ids
     
     params = {
-        "fields": "paperId,title,abstract,year,authors,url,venue,publicationTypes,citationCount,tldr"
+        "limit": min(limit, 500),
+        "fields": "paperId,corpusId,externalIds,url,title,abstract,venue,publicationVenue,year,referenceCount,citationCount,influentialCitationCount,isOpenAccess,openAccessPdf,fieldsOfStudy,s2FieldsOfStudy,publicationTypes,publicationDate,journal,citationStyles,authors"
     }
     
     try:
         response_data = make_request_with_retry(url, params=params, json_data=payload, method="POST")
         
-        # Handle both direct list response and data wrapper
-        papers = response_data if isinstance(response_data, list) else response_data.get("recommendedPapers", response_data.get("data", []))
+        # Handle response structure with recommendedPapers wrapper
+        papers = response_data.get("recommendedPapers", [])
         
         return [
             {
                 "paperId": paper.get("paperId"),
+                "corpusId": paper.get("corpusId"),
+                "externalIds": paper.get("externalIds"),
+                "url": paper.get("url"),
                 "title": paper.get("title"),
                 "abstract": paper.get("abstract"),
-                "year": paper.get("year"),
-                "authors": [{"name": author.get("name"), "authorId": author.get("authorId")} 
-                           for author in paper.get("authors", [])],
-                "url": paper.get("url"),
                 "venue": paper.get("venue"),
-                "publicationTypes": paper.get("publicationTypes"),
+                "publicationVenue": paper.get("publicationVenue"),
+                "year": paper.get("year"),
+                "referenceCount": paper.get("referenceCount"),
                 "citationCount": paper.get("citationCount"),
-                "recommendationScore": paper.get("recommendationScore"),
-                "tldr": {
-                    "model": paper.get("tldr", {}).get("model", ""),
-                    "text": paper.get("tldr", {}).get("text", "")
-                } if paper.get("tldr") else None
+                "influentialCitationCount": paper.get("influentialCitationCount"),
+                "isOpenAccess": paper.get("isOpenAccess"),
+                "openAccessPdf": paper.get("openAccessPdf"),
+                "fieldsOfStudy": paper.get("fieldsOfStudy"),
+                "s2FieldsOfStudy": paper.get("s2FieldsOfStudy"),
+                "publicationTypes": paper.get("publicationTypes"),
+                "publicationDate": paper.get("publicationDate"),
+                "journal": paper.get("journal"),
+                "citationStyles": paper.get("citationStyles"),
+                "authors": [
+                    {
+                        "authorId": author.get("authorId"),
+                        "name": author.get("name")
+                    } for author in paper.get("authors", [])
+                ]
             } for paper in papers
         ]
     except Exception as e:
         logger.error(f"Error getting paper recommendations from lists: {e}")
         return []
 
-def get_paper_recommendations(paper_id: str, limit: int = 10) -> List[Dict[str, Any]]:
+def get_paper_recommendations_single(paper_id: str, limit: int = 10) -> List[Dict[str, Any]]:
     """Get recommended papers for a single positive example paper."""
-    url = f"{BASE_URL}/paper/{paper_id}/recommendations"
+    url = f"{BASE_RECOMMENDATION_URL}/papers/forpaper/{paper_id}"
     
     params = {
         "limit": min(limit, 500),  # API typical limit
-        "fields": "paperId,title,abstract,year,authors,url,venue,publicationTypes,citationCount,tldr"
+        "fields": "paperId,corpusId,externalIds,url,title,abstract,venue,publicationVenue,year,referenceCount,citationCount,influentialCitationCount,isOpenAccess,openAccessPdf,fieldsOfStudy,s2FieldsOfStudy,publicationTypes,publicationDate,journal,citationStyles,authors"
     }
     
     try:
         response_data = make_request_with_retry(url, params=params)
         
-        # Handle both direct list response and data wrapper
-        papers = response_data if isinstance(response_data, list) else response_data.get("recommendedPapers", response_data.get("data", []))
+        # Handle response structure with recommendedPapers wrapper
+        papers = response_data.get("recommendedPapers", [])
         
         return [
             {
                 "paperId": paper.get("paperId"),
+                "corpusId": paper.get("corpusId"),
+                "externalIds": paper.get("externalIds"),
+                "url": paper.get("url"),
                 "title": paper.get("title"),
                 "abstract": paper.get("abstract"),
-                "year": paper.get("year"),
-                "authors": [{"name": author.get("name"), "authorId": author.get("authorId")} 
-                           for author in paper.get("authors", [])],
-                "url": paper.get("url"),
                 "venue": paper.get("venue"),
-                "publicationTypes": paper.get("publicationTypes"),
+                "publicationVenue": paper.get("publicationVenue"),
+                "year": paper.get("year"),
+                "referenceCount": paper.get("referenceCount"),
                 "citationCount": paper.get("citationCount"),
-                "recommendationScore": paper.get("recommendationScore"),
-                "tldr": {
-                    "model": paper.get("tldr", {}).get("model", ""),
-                    "text": paper.get("tldr", {}).get("text", "")
-                } if paper.get("tldr") else None
+                "influentialCitationCount": paper.get("influentialCitationCount"),
+                "isOpenAccess": paper.get("isOpenAccess"),
+                "openAccessPdf": paper.get("openAccessPdf"),
+                "fieldsOfStudy": paper.get("fieldsOfStudy"),
+                "s2FieldsOfStudy": paper.get("s2FieldsOfStudy"),
+                "publicationTypes": paper.get("publicationTypes"),
+                "publicationDate": paper.get("publicationDate"),
+                "journal": paper.get("journal"),
+                "citationStyles": paper.get("citationStyles"),
+                "authors": [
+                    {
+                        "authorId": author.get("authorId"),
+                        "name": author.get("name")
+                    } for author in paper.get("authors", [])
+                ]
             } for paper in papers
         ]
     except Exception as e:
