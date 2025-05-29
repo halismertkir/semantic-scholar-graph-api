@@ -89,7 +89,9 @@ npx -y @smithery/cli@latest install @alperenkocyigit/semantic-scholar-graph-api 
 
 ## 🔧 Configuration Guide
 
-### Claude Desktop Setup
+### Local Setups
+
+#### Claude Desktop Setup
 
 **macOS/Linux Configuration:**
 Add to your `claude_desktop_config.json`:
@@ -119,7 +121,7 @@ Add to your `claude_desktop_config.json`:
 }
 ```
 
-### Cline Integration
+#### Cline Integration
 ```json
 {
   "mcpServers": {
@@ -132,6 +134,73 @@ Add to your `claude_desktop_config.json`:
       "env": {},
       "disabled": false,
       "autoApprove": []
+    }
+  }
+}
+```
+
+### Remote Setups
+
+#### Auto Configuration
+```bash
+npx -y @smithery/cli@latest install @alperenkocyigit/semantic-scholar-graph-api --client <valid-client-name> --key <your-smithery-api-key>
+```
+**Valid client names: [claude,cursor,vscode,boltai]**
+
+#### Json Configuration
+**macOS/Linux Configuration:**
+```json
+{
+  "mcpServers": {
+    "semantic-scholar-graph-api": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@alperenkocyigit/semantic-scholar-graph-api",
+        "--key",
+        "your-smithery-api-key"
+      ]
+    }
+  }
+}
+```
+**Windows Configuration:**
+```json
+{
+  "mcpServers": {
+    "semantic-scholar-graph-api": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@alperenkocyigit/semantic-scholar-graph-api",
+        "--key",
+        "your-smithery-api-key"
+      ]
+    }
+  }
+}
+```
+**WSL Configuration:**
+```json
+{
+  "mcpServers": {
+    "semantic-scholar-graph-api": {
+      "command": "wsl",
+      "args": [
+        "npx",
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@alperenkocyigit/semantic-scholar-graph-api",
+        "--key",
+        "your-smithery-api-key"
+      ]
     }
   }
 }
@@ -184,15 +253,15 @@ citations = await get_semantic_scholar_citations_and_references("paper_id_here")
 semantic-scholar-graph-api/
 ├── 📄 README.md                    # Project documentation
 ├── 📋 requirements.txt             # Python dependencies
-├── 🔍 semantic_scholar_search.py   # Core API interaction module
-├── 🖥️ semantic_scholar_server.py   # MCP server implementation
+├── 🔍 search.py   # Core API interaction module
+├── 🖥️ server.py   # MCP server implementation
 └── 🗂️ __pycache__/                # Compiled Python files
 ```
 
 ### Core Components
 
-- **`semantic_scholar_search.py`**: Handles all interactions with the Semantic Scholar API, including rate limiting, error handling, and data processing
-- **`semantic_scholar_server.py`**: Implements the MCP server protocol and exposes tools for AI assistant integration
+- **`search.py`**: Handles all interactions with the Semantic Scholar API, including rate limiting, error handling, and data processing
+- **`server.py`**: Implements the MCP server protocol and exposes tools for AI assistant integration
 
 ---
 
@@ -241,5 +310,5 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 <div align="center">
   <strong>Made with ❤️ for the research community</strong>
   <br>
-  <sub>Empowering AI assistants with academic knowledge</sub>
+  <sub>Empowering AI agents with academic knowledge</sub>
 </div>
