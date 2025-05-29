@@ -495,7 +495,7 @@ def get_paper_recommendations_from_lists(positive_paper_ids: List[str], negative
         logger.error(f"Error getting paper recommendations from lists: {e}")
         return []
 
-def get_paper_recommendations_single(paper_id: str, limit: int = 10) -> List[Dict[str, Any]]:
+def get_paper_recommendations(paper_id: str, limit: int = 10) -> List[Dict[str, Any]]:
     """Get recommended papers for a single positive example paper."""
     url = f"{BASE_RECOMMENDATION_URL}/papers/forpaper/{paper_id}"
     
@@ -612,7 +612,7 @@ def main():
         # Get paper recommendations single
         if search_results:
             paper_id = search_results[0]['paperId']
-            single_recommendations = get_paper_recommendations_single(paper_id, limit=2)
+            single_recommendations = get_paper_recommendations(paper_id, limit=2)
             print(f"Single paper recommendations: {single_recommendations}")
 
     except Exception as e:
