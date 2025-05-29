@@ -18,6 +18,12 @@ This powerful MCP server bridges the gap between AI assistants and academic rese
 - **Autocomplete**: Get intelligent title suggestions as you type
 - **Precise Matching**: Find exact papers using title-based search
 
+### 🎯 **AI-Powered Recommendations**
+- **Smart Paper Recommendations**: Get personalized paper suggestions based on your interests
+- **Multi-Example Learning**: Use multiple positive and negative examples to fine-tune recommendations
+- **Single Paper Similarity**: Find papers similar to a specific research work
+- **Relevance Scoring**: AI-powered relevance scores for better paper discovery
+
 ### 👥 **Author Research**
 - **Author Profiles**: Comprehensive author information and metrics
 - **Bulk Author Data**: Fetch multiple author profiles at once
@@ -222,6 +228,8 @@ npx -y @smithery/cli@latest install @alperenkocyigit/semantic-scholar-graph-api 
 | `get_semantic_scholar_papers_batch` | Bulk paper retrieval | Batch processing |
 | `get_semantic_scholar_authors_batch` | Bulk author data | Mass analysis |
 | `search_semantic_scholar_snippets` | Search text content | Content discovery |
+| `get_semantic_scholar_paper_recommendations_from_lists` | Get recommendations from positive/negative examples | AI-powered discovery |
+| `get_semantic_scholar_paper_recommendations` | Get recommendations from single paper | Similar paper finding |
 
 ---
 
@@ -245,6 +253,37 @@ authors = await search_semantic_scholar_authors("natural language processing")
 citations = await get_semantic_scholar_citations_and_references("paper_id_here")
 ```
 
+### 🆕 AI-Powered Paper Recommendations
+
+#### Multi-Example Recommendations
+```python
+# Get recommendations based on multiple positive and negative examples
+positive_papers = ["paper_id_1", "paper_id_2", "paper_id_3"]
+negative_papers = ["bad_paper_id_1", "bad_paper_id_2"]
+recommendations = await get_semantic_scholar_paper_recommendations_from_lists(
+    positive_paper_ids=positive_papers,
+    negative_paper_ids=negative_papers,
+    limit=20
+)
+```
+
+#### Single Paper Similarity
+```python
+# Find papers similar to a specific research work
+similar_papers = await get_semantic_scholar_paper_recommendations(
+    paper_id="target_paper_id",
+    limit=15
+)
+```
+
+#### Content Discovery
+```python
+# Search for specific text content within papers
+snippets = await search_semantic_scholar_snippets(
+    query="neural network optimization",
+    limit=10
+)
+```
 ---
 
 ## 📂 Project Architecture
