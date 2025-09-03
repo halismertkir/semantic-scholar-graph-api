@@ -161,7 +161,7 @@ async def get_semantic_scholar_paper_match(
 @app.tool()
 async def get_semantic_scholar_paper_autocomplete(
     query: str
-) -> List[str]:
+) -> List[Dict[str, Any]]:
     """
     Get paper title autocompletion suggestions for a partial query.
     
@@ -169,7 +169,7 @@ async def get_semantic_scholar_paper_autocomplete(
         query: Partial paper title for autocomplete suggestions
     
     Returns:
-        List of autocomplete suggestions
+        List of autocomplete suggestion objects with id, title, and authorsYear
     """
     logger.info(f"Getting paper autocomplete for query: {query}")
     try:
