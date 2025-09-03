@@ -1,250 +1,303 @@
-from typing import Any, List, Dict
+#!/usr/bin/env python3
+"""
+Semantic Scholar MCP Server - Streamable HTTP Transport
+A Model Context Protocol (MCP) server for accessing Semantic Scholar's academic database.
+Implements the MCP Streamable HTTP transport protocol.
+"""
+
 import asyncio
 import logging
-from mcp.server.fastmcp import FastMCP
-from search import search_papers, get_paper_details, get_author_details, get_citations_and_references
+import os
+from typing import Any, Dict, List, Optional
+
+from mcp.server import FastMCP
+from pydantic import BaseModel, Field
+
+from search import (
+    search_papers, get_paper_details, get_author_details, get_citations_and_references,
+    search_authors, search_paper_match, get_paper_autocomplete, get_papers_batch,
+    get_authors_batch, search_snippets, get_paper_recommendations_from_lists,
+    get_paper_recommendations
+)
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
-# Initialize FastMCP server
-mcp = FastMCP("semanticscholar")
+# Initialize the FastMCP server
+app = FastMCP("Semantic Scholar MCP Server")
 
-@mcp.tool()
-async def search_semantic_scholar(query: str, num_results: int = 10) -> List[Dict[str, Any]]:
+# Tool implementations
+@app.tool()
+async def search_semantic_scholar_papers(
+    query: str,
+    num_results: int = 10
+) -> List[Dict[str, Any]]:
     """
     Search for papers on Semantic Scholar using a query string.
-
+    
     Args:
-        query: Search query string
-        num_results: Number of results to return (default: 10)
-
+        query: Search query for papers
+        num_results: Number of results to return (max 100)
+    
     Returns:
-        List of dictionaries containing paper information
+        List of paper objects with details like title, authors, year, abstract, etc.
     """
-    logging.info(f"Searching for papers with query: {query}, num_results: {num_results}")
+    logger.info(f"Searching for papers with query: {query}, num_results: {num_results}")
     try:
         results = await asyncio.to_thread(search_papers, query, num_results)
         return results
     except Exception as e:
-        return [{"error": f"An error occurred while searching: {str(e)}"}]
+        logger.error(f"Error searching papers: {e}")
+        raise Exception(f"An error occurred while searching: {str(e)}")
 
-@mcp.tool()
-async def get_semantic_scholar_paper_details(paper_id: str) -> Dict[str, Any]:
+@app.tool()
+async def get_semantic_scholar_paper_details(
+    paper_id: str
+) -> Dict[str, Any]:
     """
     Get details of a specific paper on Semantic Scholar.
-
+    
     Args:
-        paper_id: ID of the paper
-
+        paper_id: Paper ID (e.g., Semantic Scholar paper ID or DOI)
+    
     Returns:
-        Dictionary containing paper details
+        Paper object with comprehensive details
     """
-    logging.info(f"Fetching paper details for paper ID: {paper_id}")
+    logger.info(f"Fetching paper details for paper ID: {paper_id}")
     try:
         paper = await asyncio.to_thread(get_paper_details, paper_id)
         return paper
     except Exception as e:
-        return {"error": f"An error occurred while fetching paper details: {str(e)}"}
+        logger.error(f"Error fetching paper details: {e}")
+        raise Exception(f"An error occurred while fetching paper details: {str(e)}")
 
-@mcp.tool()
-async def get_semantic_scholar_author_details(author_id: str) -> Dict[str, Any]:
+@app.tool()
+async def get_semantic_scholar_author_details(
+    author_id: str
+) -> Dict[str, Any]:
     """
     Get details of a specific author on Semantic Scholar.
-
+    
     Args:
-        author_id: ID of the author
-
+        author_id: Author ID (Semantic Scholar author ID)
+    
     Returns:
-        Dictionary containing author details
+        Author object with comprehensive details including publications, h-index, etc.
     """
-    logging.info(f"Fetching author details for author ID: {author_id}")
+    logger.info(f"Fetching author details for author ID: {author_id}")
     try:
         author = await asyncio.to_thread(get_author_details, author_id)
         return author
     except Exception as e:
-        return {"error": f"An error occurred while fetching author details: {str(e)}"}
+        logger.error(f"Error fetching author details: {e}")
+        raise Exception(f"An error occurred while fetching author details: {str(e)}")
 
-@mcp.tool()
-async def get_semantic_scholar_citations_and_references(paper_id: str) -> Dict[str, List[Dict[str, Any]]]:
+@app.tool()
+async def get_semantic_scholar_citations_and_references(
+    paper_id: str
+) -> Dict[str, Any]:
     """
     Get citations and references for a specific paper on Semantic Scholar.
-
+    
     Args:
-        paper_id: ID of the paper
-
+        paper_id: Paper ID to get citations and references for
+    
     Returns:
-        Dictionary containing lists of citations and references
+        Object containing citations and references lists
     """
-    logging.info(f"Fetching citations and references for paper ID: {paper_id}")
+    logger.info(f"Fetching citations and references for paper ID: {paper_id}")
     try:
         citations_refs = await asyncio.to_thread(get_citations_and_references, paper_id)
         return citations_refs
     except Exception as e:
-        return {"error": f"An error occurred while fetching citations and references: {str(e)}"}
+        logger.error(f"Error fetching citations and references: {e}")
+        raise Exception(f"An error occurred while fetching citations and references: {str(e)}")
 
-@mcp.tool()
-async def search_semantic_scholar_authors(query: str, limit: int = 10) -> List[Dict[str, Any]]:
+@app.tool()
+async def search_semantic_scholar_authors(
+    query: str,
+    limit: int = 10
+) -> List[Dict[str, Any]]:
     """
     Search for authors on Semantic Scholar using a query string.
-
+    
     Args:
-        query: Search query string for author names
-        limit: Number of results to return (default: 10, max: 100)
-
+        query: Search query for authors
+        limit: Maximum number of authors to return
+    
     Returns:
-        List of dictionaries containing author information
+        List of author objects with details
     """
-    logging.info(f"Searching for authors with query: {query}, limit: {limit}")
+    logger.info(f"Searching for authors with query: {query}, limit: {limit}")
     try:
-        from search import search_authors
         results = await asyncio.to_thread(search_authors, query, limit)
         return results
     except Exception as e:
-        return [{"error": f"An error occurred while searching authors: {str(e)}"}]
+        logger.error(f"Error searching authors: {e}")
+        raise Exception(f"An error occurred while searching authors: {str(e)}")
 
-@mcp.tool()
-async def get_semantic_scholar_paper_match(query: str) -> Dict[str, Any]:
+@app.tool()
+async def get_semantic_scholar_paper_match(
+    query: str
+) -> Dict[str, Any]:
     """
     Find the best matching paper on Semantic Scholar using title-based search.
-
+    
     Args:
-        query: Paper title or partial title to match
-
+        query: Paper title or description to match
+    
     Returns:
-        Dictionary containing the best matching paper with match score
+        Best matching paper object
     """
-    logging.info(f"Finding paper match for query: {query}")
+    logger.info(f"Finding paper match for query: {query}")
     try:
-        from search import search_paper_match
         result = await asyncio.to_thread(search_paper_match, query)
         return result
     except Exception as e:
-        return {"error": f"An error occurred while finding paper match: {str(e)}"}
+        logger.error(f"Error finding paper match: {e}")
+        raise Exception(f"An error occurred while finding paper match: {str(e)}")
 
-@mcp.tool()
-async def get_semantic_scholar_paper_autocomplete(query: str) -> List[Dict[str, Any]]:
+@app.tool()
+async def get_semantic_scholar_paper_autocomplete(
+    query: str
+) -> List[str]:
     """
     Get paper title autocompletion suggestions for a partial query.
-
+    
     Args:
-        query: Partial paper title query (will be truncated to 100 characters)
-
+        query: Partial paper title for autocomplete suggestions
+    
     Returns:
-        List of dictionaries containing autocomplete suggestions
+        List of autocomplete suggestions
     """
-    logging.info(f"Getting paper autocomplete for query: {query}")
+    logger.info(f"Getting paper autocomplete for query: {query}")
     try:
-        from search import get_paper_autocomplete
         results = await asyncio.to_thread(get_paper_autocomplete, query)
         return results
     except Exception as e:
-        return [{"error": f"An error occurred while getting autocomplete suggestions: {str(e)}"}]
+        logger.error(f"Error getting autocomplete suggestions: {e}")
+        raise Exception(f"An error occurred while getting autocomplete suggestions: {str(e)}")
 
-@mcp.tool()
-async def get_semantic_scholar_papers_batch(paper_ids: List[str]) -> List[Dict[str, Any]]:
+@app.tool()
+async def get_semantic_scholar_papers_batch(
+    paper_ids: List[str]
+) -> List[Dict[str, Any]]:
     """
     Get details for multiple papers at once using batch API.
-
+    
     Args:
-        paper_ids: List of paper IDs (max 500)
-
+        paper_ids: List of paper IDs to fetch
+    
     Returns:
-        List of dictionaries containing paper details
+        List of paper objects
     """
-    logging.info(f"Fetching batch paper details for {len(paper_ids)} papers")
+    logger.info(f"Fetching batch paper details for {len(paper_ids)} papers")
     try:
-        from search import get_papers_batch
         results = await asyncio.to_thread(get_papers_batch, paper_ids)
         return results
     except Exception as e:
-        return [{"error": f"An error occurred while fetching batch paper details: {str(e)}"}]
+        logger.error(f"Error fetching batch paper details: {e}")
+        raise Exception(f"An error occurred while fetching batch paper details: {str(e)}")
 
-@mcp.tool()
-async def get_semantic_scholar_authors_batch(author_ids: List[str]) -> List[Dict[str, Any]]:
+@app.tool()
+async def get_semantic_scholar_authors_batch(
+    author_ids: List[str]
+) -> List[Dict[str, Any]]:
     """
     Get details for multiple authors at once using batch API.
-
+    
     Args:
-        author_ids: List of author IDs (max 1000)
-
+        author_ids: List of author IDs to fetch
+    
     Returns:
-        List of dictionaries containing author details
+        List of author objects
     """
-    logging.info(f"Fetching batch author details for {len(author_ids)} authors")
+    logger.info(f"Fetching batch author details for {len(author_ids)} authors")
     try:
-        from search import get_authors_batch
         results = await asyncio.to_thread(get_authors_batch, author_ids)
         return results
     except Exception as e:
-        return [{"error": f"An error occurred while fetching batch author details: {str(e)}"}]
+        logger.error(f"Error fetching batch author details: {e}")
+        raise Exception(f"An error occurred while fetching batch author details: {str(e)}")
 
-@mcp.tool()
-async def search_semantic_scholar_snippets(query: str, limit: int = 10) -> List[Dict[str, Any]]:
+@app.tool()
+async def search_semantic_scholar_snippets(
+    query: str,
+    limit: int = 10
+) -> List[Dict[str, Any]]:
     """
     Search for text snippets from papers that match the query.
-
+    
     Args:
-        query: Plain-text search query
-        limit: Number of results to return (default: 10, max: 1000)
-
+        query: Search query for text snippets within papers
+        limit: Maximum number of snippets to return
+    
     Returns:
-        List of dictionaries containing snippet matches with paper info
+        List of snippet objects with context and source paper information
     """
-    logging.info(f"Searching for text snippets with query: {query}, limit: {limit}")
+    logger.info(f"Searching for text snippets with query: {query}, limit: {limit}")
     try:
-        from search import search_snippets
         results = await asyncio.to_thread(search_snippets, query, limit)
         return results
     except Exception as e:
-        return [{"error": f"An error occurred while searching snippets: {str(e)}"}]
+        logger.error(f"Error searching snippets: {e}")
+        raise Exception(f"An error occurred while searching snippets: {str(e)}")
 
-@mcp.tool()
+@app.tool()
 async def get_semantic_scholar_paper_recommendations_from_lists(
-    positive_paper_ids: List[str], 
-    negative_paper_ids: List[str] = None, 
+    positive_paper_ids: List[str],
+    negative_paper_ids: List[str] = [],
     limit: int = 10
 ) -> List[Dict[str, Any]]:
     """
     Get recommended papers based on lists of positive and negative example papers.
-
+    
     Args:
-        positive_paper_ids: List of paper IDs that represent positive examples (papers you like/want similar to)
-        negative_paper_ids: Optional list of paper IDs that represent negative examples (papers you don't want similar to)
-        limit: Number of recommendations to return (default: 10, max: 500)
-
+        positive_paper_ids: List of positive example paper IDs
+        negative_paper_ids: List of negative example paper IDs
+        limit: Maximum number of recommendations to return
+    
     Returns:
-        List of dictionaries containing recommended papers with relevance scores
+        List of recommended paper objects with relevance scores
     """
-    logging.info(f"Getting paper recommendations from lists: {len(positive_paper_ids)} positive, {len(negative_paper_ids) if negative_paper_ids else 0} negative, limit: {limit}")
+    logger.info(f"Getting paper recommendations from lists: {len(positive_paper_ids)} positive, {len(negative_paper_ids)} negative, limit: {limit}")
     try:
-        from search import get_paper_recommendations_from_lists
-        results = await asyncio.to_thread(get_paper_recommendations_from_lists, positive_paper_ids, negative_paper_ids, limit)
+        results = await asyncio.to_thread(get_paper_recommendations_from_lists, positive_paper_ids, negative_paper_ids or [], limit)
         return results
     except Exception as e:
-        return [{"error": f"An error occurred while getting paper recommendations from lists: {str(e)}"}]
+        logger.error(f"Error getting paper recommendations from lists: {e}")
+        raise Exception(f"An error occurred while getting paper recommendations from lists: {str(e)}")
 
-@mcp.tool()
-async def get_semantic_scholar_paper_recommendations(paper_id: str, limit: int = 10) -> List[Dict[str, Any]]:
+@app.tool()
+async def get_semantic_scholar_paper_recommendations(
+    paper_id: str,
+    limit: int = 10
+) -> List[Dict[str, Any]]:
     """
     Get recommended papers for a single positive example paper.
-
+    
     Args:
-        paper_id: ID of the paper to get recommendations for (positive example)
-        limit: Number of recommendations to return (default: 10, max: 500)
-
+        paper_id: Paper ID to get recommendations for
+        limit: Maximum number of recommendations to return
+    
     Returns:
-        List of dictionaries containing recommended papers similar to the input paper
+        List of recommended paper objects with relevance scores
     """
-    logging.info(f"Getting paper recommendations for single paper: {paper_id}, limit: {limit}")
+    logger.info(f"Getting paper recommendations for single paper: {paper_id}, limit: {limit}")
     try:
-        from search import get_paper_recommendations
         results = await asyncio.to_thread(get_paper_recommendations, paper_id, limit)
         return results
     except Exception as e:
-        return [{"error": f"An error occurred while getting paper recommendations for single paper: {str(e)}"}]
+        logger.error(f"Error getting paper recommendations for single paper: {e}")
+        raise Exception(f"An error occurred while getting paper recommendations for single paper: {str(e)}")
 
 if __name__ == "__main__":
-    # Initialize and run the server
-    logging.info("Starting Semantic Scholar MCP server")
-    mcp.run(transport='stdio')
+    # Get configuration from environment variables
+    port = int(os.getenv('PORT', 3000))
+    host = os.getenv('HOST', '0.0.0.0')
+    
+    logger.info(f"Starting Semantic Scholar MCP HTTP Server on {host}:{port}")
+    
+    # Run the FastMCP server with streamable HTTP transport
+    app.run(transport="streamable-http")

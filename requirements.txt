@@ -1,3 +1,7 @@
 requests
 bs4 
 mcp
+uvicorn
+httpx
+pydantic
+anyio

@@ -1,0 +1,47 @@
+name: semantic-scholar-graph-api
+description: "A comprehensive Model Context Protocol (MCP) server for accessing Semantic Scholar's academic database"
+version: "1.0.0"
+transport: streamable-http
+runtime: python
+entrypoint: server.py
+port: 8000
+
+capabilities:
+  tools: true
+  resources: false
+  prompts: false
+
+environment:
+  HOST: "0.0.0.0"
+  PORT: "8000"
+
+dependencies:
+  - requests
+  - bs4
+  - mcp
+  - uvicorn
+  - httpx
+  - pydantic
+  - anyio
+
+python:
+  version: "3.11"
+  requirements: requirements.txt
+
+health_check:
+  path: "/"
+  timeout: 30
+  interval: 30
+
+resources:
+  memory: 256
+  cpu: 0.5
+
+tags:
+  - academic
+  - research
+  - papers
+  - citations
+  - semantic-scholar
+  - ai
+  - machine-learning
